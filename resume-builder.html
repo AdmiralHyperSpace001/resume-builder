@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ResumeForge — Ivy League ATS Builder</title>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #1b2a3b;
+  --gold: #b8973a;
+  --gold-pale: #e8d8a0;
+  --cream: #faf8f3;
+  --paper: #ffffff;
+  --ink: #1a1a1a;
+  --muted: #5a5550;
+  --rule: #c8c0b0;
+  --border: #e0dbd2;
+  --sidebar: #f5f2ec;
+  --success: #2e7d52;
+  --warn: #b05a1a;
+  --danger: #9b2335;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Jost',sans-serif;background:var(--cream);color:var(--ink);min-height:100vh;}
+
+.topbar{background:var(--navy);display:flex;align-items:center;justify-content:space-between;padding:0 48px;height:56px;position:sticky;top:0;z-index:200;border-bottom:2px solid var(--gold);}
+.brand{font-family:'EB Garamond',serif;font-size:1.3rem;color:#fff;letter-spacing:.04em;display:flex;align-items:center;gap:10px;}
+.brand-accent{color:var(--gold);}
+.brand-sub{font-family:'Jost',sans-serif;font-size:.65rem;letter-spacing:.18em;text-transform:uppercase;color:#8899aa;border-left:1px solid #334;padding-left:12px;margin-left:4px;}
+
+.app{display:grid;grid-template-columns:460px 1fr;height:calc(100vh - 56px);}
+
+/* FORM */
+.form-panel{background:#fff;border-right:1px solid var(--border);overflow-y:auto;height:100%;}
+.form-panel::-webkit-scrollbar{width:5px;}
+.form-panel::-webkit-scrollbar-track{background:var(--sidebar);}
+.form-panel::-webkit-scrollbar-thumb{background:var(--rule);border-radius:4px;}
+.form-inner{padding:26px 30px 80px;}
+
+.fsec{margin-bottom:26px;}
+.fsec-head{display:flex;align-items:center;gap:8px;font-family:'EB Garamond',serif;font-size:.92rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--navy);border-bottom:1.5px solid var(--gold-pale);padding-bottom:7px;margin-bottom:13px;}
+.fsec-head svg{color:var(--gold);flex-shrink:0;}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.grid1{display:grid;grid-template-columns:1fr;}
+
+.field{display:flex;flex-direction:column;gap:4px;margin-bottom:9px;}
+.field label{font-size:.67rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);}
+.field input,.field textarea,.field select{font-family:'Jost',sans-serif;font-size:.875rem;padding:9px 11px;border:1.5px solid var(--border);border-radius:4px;background:var(--cream);color:var(--ink);outline:none;transition:border-color .18s,box-shadow .18s;}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(184,151,58,.1);background:#fff;}
+.field textarea{resize:vertical;min-height:66px;line-height:1.55;}
+
+/* Photo */
+.photo-wrap{display:flex;align-items:center;gap:16px;margin-bottom:16px;}
+.photo-circle{width:70px;height:70px;border-radius:50%;background:var(--sidebar);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;cursor:pointer;transition:border-color .2s;}
+.photo-circle:hover{border-color:var(--gold);}
+.photo-circle img{width:100%;height:100%;object-fit:cover;}
+.photo-placeholder{display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--rule);pointer-events:none;}
+.photo-placeholder svg{width:26px;height:26px;}
+.photo-placeholder span{font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;}
+.photo-info{font-size:.77rem;color:var(--muted);line-height:1.5;}
+.photo-info b{display:block;font-size:.8rem;color:var(--navy);margin-bottom:2px;}
+#photo-file{display:none;}
+
+/* Dynamic items */
+.dyn-item{background:var(--sidebar);border:1.5px solid var(--border);border-radius:5px;padding:13px 13px 9px;margin-bottom:9px;position:relative;animation:fadeUp .2s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(-5px);}to{opacity:1;transform:translateY(0);}}
+.remove-btn{position:absolute;top:8px;right:8px;background:none;border:none;color:#ccc;cursor:pointer;width:20px;height:20px;display:flex;align-items:center;justify-content:center;border-radius:3px;transition:color .15s,background .15s;}
+.remove-btn:hover{color:var(--danger);background:rgba(155,35,53,.08);}
+
+.add-btn{width:100%;background:none;border:1.5px dashed var(--rule);color:var(--muted);padding:8px;border-radius:5px;font-family:'Jost',sans-serif;font-size:.8rem;font-weight:500;letter-spacing:.04em;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .18s;margin-top:2px;}
+.add-btn:hover{border-color:var(--gold);color:var(--gold);background:rgba(184,151,58,.04);}
+
+/* Skills */
+.skills-wrap{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;}
+.skill-chip{background:#fff;border:1px solid var(--border);border-radius:3px;padding:4px 8px;font-size:.76rem;display:flex;align-items:center;gap:5px;animation:fadeUp .2s ease;}
+.skill-chip button{background:none;border:none;cursor:pointer;color:#bbb;line-height:1;padding:0;font-size:.8rem;transition:color .15s;}
+.skill-chip button:hover{color:var(--danger);}
+.skill-row{display:flex;gap:7px;}
+.skill-row input{flex:1;}
+.skill-row button{background:var(--navy);color:#fff;border:none;border-radius:4px;padding:9px 14px;font-family:'Jost',sans-serif;font-size:.78rem;font-weight:600;cursor:pointer;white-space:nowrap;transition:background .18s;}
+.skill-row button:hover{background:var(--gold);}
+
+/* Generate */
+.gen-btn{width:100%;background:var(--navy);color:#fff;border:none;border-radius:5px;padding:13px;font-family:'EB Garamond',serif;font-size:1.05rem;font-weight:600;letter-spacing:.05em;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;position:relative;overflow:hidden;margin-top:10px;transition:background .2s;}
+.gen-btn::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--gold),#d4a840);opacity:0;transition:opacity .25s;}
+.gen-btn:hover::after{opacity:1;}
+.gen-btn>*{position:relative;z-index:1;}
+.spinner{width:15px;height:15px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:none;}
+.gen-btn.loading .spinner{display:block;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* PREVIEW */
+.preview-panel{background:#d5d0c8;overflow-y:auto;padding:32px 36px;display:flex;flex-direction:column;align-items:center;}
+.preview-panel::-webkit-scrollbar{width:5px;}
+.preview-panel::-webkit-scrollbar-track{background:#ccc;}
+.preview-panel::-webkit-scrollbar-thumb{background:#aaa;border-radius:4px;}
+
+.ctrl-bar{display:flex;align-items:center;gap:10px;margin-bottom:22px;width:100%;max-width:760px;}
+.ats-pill{background:#fff;border:1px solid var(--border);border-radius:4px;padding:7px 15px;display:flex;align-items:center;gap:8px;font-size:.75rem;font-weight:600;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-right:auto;}
+.ats-val{font-family:'EB Garamond',serif;font-size:1.2rem;font-weight:700;}
+.ats-val.hi{color:var(--success);}
+.ats-val.mid{color:var(--warn);}
+.ats-val.lo{color:var(--danger);}
+.print-btn{background:var(--navy);color:#fff;border:none;border-radius:4px;padding:8px 16px;font-family:'Jost',sans-serif;font-size:.78rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;gap:7px;transition:background .18s;}
+.print-btn:hover{background:var(--gold);}
+
+#resume-out{background:#fff;width:100%;max-width:760px;min-height:960px;box-shadow:0 6px 48px rgba(0,0,0,.18);border-radius:1px;overflow:hidden;}
+.ph-state{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:580px;color:var(--muted);text-align:center;gap:14px;padding:48px;}
+.ph-icon{width:56px;height:56px;opacity:.18;color:var(--navy);}
+.ph-state h3{font-family:'EB Garamond',serif;font-size:1.35rem;color:var(--navy);opacity:.32;}
+.ph-state p{font-size:.83rem;opacity:.38;max-width:280px;line-height:1.65;}
+
+/* ══ RESUME DOC ══ */
+.rdoc{font-family:'Crimson Pro',serif;font-size:10.8pt;line-height:1.38;color:#111;padding:0.65in 0.75in 0.75in;}
+.r-header{display:flex;flex-direction:column;align-items:center;padding-bottom:14px;border-bottom:2px solid #111;margin-bottom:13px;}
+.r-photo{width:78px;height:78px;border-radius:50%;object-fit:cover;margin-bottom:9px;border:1.5px solid #ddd;}
+.r-initials{width:78px;height:78px;border-radius:50%;background:#ede8e0;display:flex;align-items:center;justify-content:center;font-family:'EB Garamond',serif;font-size:1.55rem;font-weight:600;color:#666;margin-bottom:9px;letter-spacing:.06em;}
+.r-name{font-family:'EB Garamond',serif;font-size:19pt;font-weight:600;letter-spacing:.06em;text-align:center;text-transform:uppercase;}
+.r-jtitle{font-family:'Crimson Pro',serif;font-style:italic;font-size:11pt;color:#444;text-align:center;margin-top:2px;}
+.r-contact{display:flex;flex-wrap:wrap;justify-content:center;gap:0 3px;margin-top:6px;font-size:9pt;color:#333;line-height:1.9;}
+.r-contact a{color:#1a1a1a;text-decoration:none;}
+.r-dot{color:#bbb;margin:0 3px;}
+.r-sec{margin-bottom:12px;}
+.r-sec-head{font-family:'Crimson Pro',serif;font-size:9.5pt;font-weight:600;text-transform:uppercase;letter-spacing:.12em;border-bottom:1pt solid #111;padding-bottom:2px;margin-bottom:7px;color:#111;}
+.r-summary{font-size:10.5pt;line-height:1.55;text-align:justify;color:#222;}
+.r-row{margin-bottom:8px;}
+.r-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;}
+.r-bold{font-weight:600;font-size:10.8pt;}
+.r-italic{font-style:italic;font-size:10.4pt;}
+.r-right{font-size:9.8pt;color:#333;white-space:nowrap;flex-shrink:0;}
+.r-sub{font-size:9.8pt;color:#444;margin-top:1px;}
+.r-bullets{margin:3px 0 0 16px;padding:0;}
+.r-bullets li{font-size:10.4pt;margin-bottom:1.5px;list-style-type:disc;padding-left:1px;line-height:1.45;}
+.r-skills-block{display:flex;flex-direction:column;gap:3px;}
+.r-skill-line{font-size:10.4pt;}
+.r-skill-label{font-weight:600;}
+.r-link{font-size:9pt;color:#2b5faa;}
+
+@media print{
+  .topbar,.form-panel,.ctrl-bar{display:none!important;}
+  .preview-panel{background:none;padding:0;height:auto;}
+  #resume-out{box-shadow:none;max-width:100%;}
+  .rdoc{padding:.5in;}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">Resume<span class="brand-accent">Forge</span><span class="brand-sub">Ivy League · ATS Optimized</span></div>
+</div>
+
+<div class="app">
+
+<!-- FORM PANEL -->
+<div class="form-panel"><div class="form-inner">
+
+  <!-- Photo -->
+  <div class="fsec">
+    <div class="fsec-head">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+      Profile Photo
+    </div>
+    <div class="photo-wrap">
+      <div class="photo-circle" onclick="document.getElementById('photo-file').click()" id="photo-preview">
+        <div class="photo-placeholder">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+          <span>Upload</span>
+        </div>
+      </div>
+      <div class="photo-info"><b>Profile Photo</b>Click to upload a professional headshot. Square images work best. Shown centered at the top of the resume.</div>
+    </div>
+    <input type="file" id="photo-file" accept="image/*" onchange="handlePhoto(this)">
+  </div>
+
+  <!-- Personal -->
+  <div class="fsec">
+    <div class="fsec-head">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M15 8h2M15 12h2M6 16h12"/></svg>
+      Personal Information
+    </div>
+    <div class="grid2">
+      <div class="field"><label>First Name</label><input id="fname" placeholder="John"/></div>
+      <div class="field"><label>Last Name</label><input id="lname" placeholder="Snow"/></div>
+    </div>
+    <div class="grid2">
+      <div class="field"><label>Headline / Title</label><input id="jtitle" placeholder="Full Stack Developer"/></div>
+      <div class="field"><label>City, Country</label><input id="loc" placeholder="Islamabad, Pakistan"/></div>
+    </div>
+    <div class="grid2">
+      <div class="field"><label>Email</label><input id="email" type="email" placeholder="you@email.com"/></div>
+      <div class="field"><label>Phone</label><input id="phone" placeholder="+92 321 0000000"/></div>
+    </div>
+    <div class="grid2">
+      <div class="field"><label>LinkedIn</label><input id="linkedin" placeholder="linkedin.com/in/yourname"/></div>
+      <div class="field"><label>Portfolio / Website</label><input id="website" placeholder="yoursite.com"/></div>
+    </div>
+    <div class="grid2">
+      <div class="field"><label>GitHub</label><input id="github" placeholder="github.com/username"/></div>
+      <div class="field"><label>Other (Behance, etc.)</label><input id="other" placeholder="optional"/></div>
+    </div>
+  </div>
+
+  <!-- Summary -->
+  <div class="fsec">
+    <div class="fsec-head">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+      Professional Summary
+    </div>
+    <div class="field"><label>Summary — leave blank to auto-generate with AI</label>
+      <textarea id="summary" rows="3" placeholder="Results-driven developer with hands-on experience in full-stack development..."></textarea>
+    </div>
+  </div>
+
+  <!-- Education -->
+  <div class="fsec">
+    <div class="fsec-head">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 1.66 2.686 3 6 3s6-1.34 6-3v-5"/></svg>
+      Education
+    </div>
+    <div id="edu-list"></div>
+    <button class="add-btn" onclick="addEdu()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Add Education
+    </button>
+  </div>
+
+  <!-- Experience -->
+  <div class="fsec">
+    <div class="fsec-head">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>
+      Work Experience
+    </div>
+    <div id="exp-list"></div>
+    <button class="add-btn" onclick="addExp()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Add Experience
+    </button>
+  </div>
+
+  <!-- Projects -->
+  <div class="fsec">
+    <div class="fsec-head">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+      Projects
+    </div>
+    <div id="proj-list"></div>
+    <button class="add-btn" onclick="addProj()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Add Project
+    </button>
+  </div>
+
+  <!-- Skills -->
+  <div class="fsec">
+    <div class="fsec-head">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14"/></svg>
+      Technical Skills
+    </div>
+    <div id="skills-wrap" class="skills-wrap"></div>
+    <div class="skill-row">
+      <div class="field" style="margin:0;flex:1;"><input id="skill-in" placeholder="Python, .NET, React, SQL... (press Enter)" onkeydown="if(event.key==='Enter'){addSkill();event.preventDefault()}"/></div>
+      <button onclick="addSkill()">Add</button>
+    </div>
+    <p style="font-size:.7rem;color:var(--muted);margin-top:6px;line-height:1.5;">Include keywords from the job description. ATS systems scan for exact matches.</p>
+  </div>
+
+  <!-- Certifications -->
+  <div class="fsec">
+    <div class="fsec-head">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
+      Certifications &amp; Awards
+    </div>
+    <div id="cert-list"></div>
+    <button class="add-btn" onclick="addCert()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Add Certification / Award
+    </button>
+  </div>
+
+  <!-- Generate -->
+  <button class="gen-btn" id="gen-btn" onclick="generate()">
+    <div class="spinner"></div>
+    <span id="gen-label">Generate Resume</span>
+  </button>
+
+</div></div>
+
+<!-- PREVIEW PANEL -->
+<div class="preview-panel">
+  <div class="ctrl-bar">
+    <div class="ats-pill">ATS Score &nbsp;<span class="ats-val" id="ats-val">—</span></div>
+    <button class="print-btn" onclick="window.print()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+      Print / Save PDF
+    </button>
+  </div>
+  <div id="resume-out">
+    <div class="ph-state">
+      <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      <h3>Your Resume Appears Here</h3>
+      <p>Fill in the form and click Generate Resume to produce your Ivy League-style ATS document.</p>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+const skills=[];
+let eduN=0,expN=0,projN=0,certN=0,photoDataUrl=null;
+
+function handlePhoto(input){
+  const file=input.files[0]; if(!file) return;
+  const r=new FileReader();
+  r.onload=e=>{
+    photoDataUrl=e.target.result;
+    document.getElementById('photo-preview').innerHTML=`<img src="${photoDataUrl}" alt="Profile">`;
+  };
+  r.readAsDataURL(file);
+}
+
+const v=id=>{const el=document.getElementById(id);return el?el.value.trim():'';};
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const buls=txt=>txt.split('\n').map(l=>l.trim()).filter(Boolean).map(l=>`<li>${esc(l)}</li>`).join('');
+const X=`<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
+
+function addEdu(){
+  const id=++eduN; const d=document.createElement('div');
+  d.className='dyn-item';d.id=`edu-${id}`;
+  d.innerHTML=`<button class="remove-btn" onclick="rm('edu-${id}')">${X}</button>
+  <div class="grid2"><div class="field"><label>Institution</label><input id="ei-${id}" placeholder="FAST"/></div><div class="field"><label>Location</label><input id="el-${id}" placeholder="Islamabad"/></div></div>
+  <div class="grid2"><div class="field"><label>Degree & Major</label><input id="ed-${id}" placeholder="Bachelor of Computer Science"/></div><div class="field"><label>GPA (optional)</label><input id="eg-${id}" placeholder="3.7 / 4.0"/></div></div>
+  <div class="grid2"><div class="field"><label>From</label><input id="es-${id}" placeholder="08/2025"/></div><div class="field"><label>To</label><input id="ee-${id}" placeholder="06/2029"/></div></div>
+  <div class="field"><label>Relevant Courses / Honors</label><input id="en-${id}" placeholder="Data Structures, Machine Learning, Dean's List"/></div>`;
+  document.getElementById('edu-list').appendChild(d);
+}
+
+function addExp(){
+  const id=++expN; const d=document.createElement('div');
+  d.className='dyn-item';d.id=`exp-${id}`;
+  d.innerHTML=`<button class="remove-btn" onclick="rm('exp-${id}')">${X}</button>
+  <div class="grid2"><div class="field"><label>Company</label><input id="eco-${id}" placeholder="Company Name"/></div><div class="field"><label>Location</label><input id="elo-${id}" placeholder="City / Remote"/></div></div>
+  <div class="grid2"><div class="field"><label>Job Title</label><input id="et-${id}" placeholder="Software Engineer"/></div><div class="field"><label>Type</label><select id="ety-${id}"><option>Full-time</option><option>Part-time</option><option>Internship</option><option>Contract</option><option>Freelance</option></select></div></div>
+  <div class="grid2"><div class="field"><label>From</label><input id="efs-${id}" placeholder="Jun 2023"/></div><div class="field"><label>To</label><input id="efe-${id}" placeholder="Aug 2023 / Present"/></div></div>
+  <div class="field"><label>Achievements — one per line, include metrics (%,  numbers, $)</label><textarea id="eb-${id}" rows="4" placeholder="Reduced API response time by 40% through query optimization&#10;Led a team of 3 engineers to ship feature 2 weeks early&#10;Automated deployment pipeline saving 5 hours per week"></textarea></div>`;
+  document.getElementById('exp-list').appendChild(d);
+}
+
+function addProj(){
+  const id=++projN; const d=document.createElement('div');
+  d.className='dyn-item';d.id=`proj-${id}`;
+  d.innerHTML=`<button class="remove-btn" onclick="rm('proj-${id}')">${X}</button>
+  <div class="grid2"><div class="field"><label>Project Name</label><input id="pn-${id}" placeholder="University Timetable"/></div><div class="field"><label>Tech Stack</label><input id="pt-${id}" placeholder="Python, FastAPI, JS"/></div></div>
+  <div class="grid2"><div class="field"><label>Live URL (optional)</label><input id="pu-${id}" placeholder="https://project.com"/></div><div class="field"><label>GitHub (optional)</label><input id="pg-${id}" placeholder="github.com/you/repo"/></div></div>
+  <div class="grid2"><div class="field"><label>Date / Period</label><input id="pd-${id}" placeholder="Jan 2024 – Mar 2024"/></div></div>
+  <div class="field"><label>Description — one point per line</label><textarea id="pb-${id}" rows="3" placeholder="Developed FastAPI website replacing legacy Google Sheets timetable&#10;Served 1,200+ students across 4 departments with zero downtime"></textarea></div>`;
+  document.getElementById('proj-list').appendChild(d);
+}
+
+function addCert(){
+  const id=++certN; const d=document.createElement('div');
+  d.className='dyn-item';d.id=`cert-${id}`;
+  d.innerHTML=`<button class="remove-btn" onclick="rm('cert-${id}')">${X}</button>
+  <div class="grid2"><div class="field"><label>Title</label><input id="ct-${id}" placeholder="AWS Solutions Architect"/></div><div class="field"><label>Issuer</label><input id="co-${id}" placeholder="Amazon Web Services"/></div></div>
+  <div class="grid2"><div class="field"><label>Date</label><input id="cd-${id}" placeholder="Mar 2024"/></div><div class="field"><label>Credential URL</label><input id="cu-${id}" placeholder="https://..."/></div></div>`;
+  document.getElementById('cert-list').appendChild(d);
+}
+
+function rm(id){const el=document.getElementById(id);if(el)el.remove();}
+
+function addSkill(){
+  const inp=document.getElementById('skill-in');
+  inp.value.split(',').map(s=>s.trim()).filter(Boolean).forEach(s=>{
+    if(s&&!skills.includes(s)){
+      skills.push(s);
+      const chip=document.createElement('div');
+      chip.className='skill-chip';
+      chip.id='sc-'+s.replace(/\W/g,'_');
+      chip.innerHTML=`${esc(s)} <button onclick="rmSkill('${s.replace(/'/g,"\\'")}')">&#x2715;</button>`;
+      document.getElementById('skills-wrap').appendChild(chip);
+    }
+  });
+  inp.value='';
+}
+function rmSkill(s){
+  skills.splice(skills.indexOf(s),1);
+  const el=document.getElementById('sc-'+s.replace(/\W/g,'_'));
+  if(el)el.remove();
+}
+
+function collect(){
+  const edu=[],exp=[],proj=[],certs=[];
+  document.querySelectorAll('[id^="ei-"]').forEach(el=>{
+    const id=el.id.slice(3);
+    edu.push({inst:v(`ei-${id}`),loc:v(`el-${id}`),deg:v(`ed-${id}`),gpa:v(`eg-${id}`),from:v(`es-${id}`),to:v(`ee-${id}`),notes:v(`en-${id}`)});
+  });
+  document.querySelectorAll('[id^="eco-"]').forEach(el=>{
+    const id=el.id.slice(4);
+    exp.push({co:v(`eco-${id}`),loc:v(`elo-${id}`),title:v(`et-${id}`),type:v(`ety-${id}`),from:v(`efs-${id}`),to:v(`efe-${id}`),bullets:v(`eb-${id}`)});
+  });
+  document.querySelectorAll('[id^="pn-"]').forEach(el=>{
+    const id=el.id.slice(3);
+    proj.push({name:v(`pn-${id}`),tech:v(`pt-${id}`),url:v(`pu-${id}`),gh:v(`pg-${id}`),date:v(`pd-${id}`),desc:v(`pb-${id}`)});
+  });
+  document.querySelectorAll('[id^="ct-"]').forEach(el=>{
+    const id=el.id.slice(3);
+    certs.push({title:v(`ct-${id}`),org:v(`co-${id}`),date:v(`cd-${id}`),url:v(`cu-${id}`)});
+  });
+  return{name:`${v('fname')} ${v('lname')}`.trim(),jtitle:v('jtitle'),loc:v('loc'),email:v('email'),phone:v('phone'),linkedin:v('linkedin'),website:v('website'),github:v('github'),other:v('other'),summary:v('summary'),edu,exp,proj,certs};
+}
+
+function atsScore(d){
+  let s=0;
+  if(d.name)s+=5;if(d.email)s+=5;if(d.phone)s+=5;if(d.linkedin)s+=5;if(d.website)s+=3;if(d.github)s+=3;if(d.loc)s+=3;
+  if(d.summary)s+=10;
+  s+=Math.min(d.edu.filter(e=>e.inst).length*8,16);
+  s+=Math.min(d.exp.filter(e=>e.co).length*10,20);
+  s+=Math.min(d.proj.filter(p=>p.name).length*5,15);
+  s+=Math.min(skills.length*1.5,15);
+  s+=Math.min(d.certs.filter(c=>c.title).length*4,8);
+  const et=d.exp.map(e=>e.bullets).join(' ');
+  if(/\d+%/.test(et)||/\$[\d,]+/.test(et)||/\d+[kKmM]/.test(et))s+=5;
+  if(photoDataUrl)s+=2;
+  return Math.min(Math.round(s),100);
+}
+
+async function fetchSummary(d){
+  try{
+    const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,messages:[{role:"user",content:`Write a 2–3 sentence ATS-optimized professional summary for this resume. No first-person pronouns. Action-oriented and results-focused.
+Name: ${d.name} | Title: ${d.jtitle}
+Latest role: ${d.exp[0]?.title||''} at ${d.exp[0]?.co||''}
+Education: ${d.edu[0]?.deg||''} from ${d.edu[0]?.inst||''}
+Skills: ${skills.slice(0,10).join(', ')}
+Return only the summary text, no quotes.`}]})});
+    const j=await r.json();
+    return j.content?.[0]?.text?.trim()||'';
+  }catch(e){return'';}
+}
+
+function contactHtml(d){
+  const pts=[];
+  if(d.loc) pts.push(`<span>${esc(d.loc)}</span>`);
+  if(d.phone) pts.push(`<span><a href="tel:${esc(d.phone)}">${esc(d.phone)}</a></span>`);
+  if(d.email) pts.push(`<span><a href="mailto:${esc(d.email)}">${esc(d.email)}</a></span>`);
+  if(d.linkedin) pts.push(`<span><a href="https://${d.linkedin.replace(/^https?:\/\//,'')}">${esc(d.linkedin)}</a></span>`);
+  if(d.website) pts.push(`<span><a href="https://${d.website.replace(/^https?:\/\//,'')}">${esc(d.website)}</a></span>`);
+  if(d.github) pts.push(`<span><a href="https://${d.github.replace(/^https?:\/\//,'')}">${esc(d.github)}</a></span>`);
+  if(d.other) pts.push(`<span>${esc(d.other)}</span>`);
+  return pts.join('<span class="r-dot">&bull;</span>');
+}
+
+function renderResume(d,summary){
+  const initials=d.name.split(' ').map(w=>w[0]||'').join('').slice(0,2).toUpperCase();
+  let h=`<div class="rdoc"><div class="r-header">`;
+  if(photoDataUrl) h+=`<img class="r-photo" src="${photoDataUrl}" alt="Profile">`;
+  else h+=`<div class="r-initials">${esc(initials)||'?'}</div>`;
+  h+=`<div class="r-name">${esc(d.name||'Your Name')}</div>`;
+  if(d.jtitle) h+=`<div class="r-jtitle">${esc(d.jtitle)}</div>`;
+  h+=`<div class="r-contact">${contactHtml(d)}</div></div>`;
+
+  if(summary) h+=`<div class="r-sec"><div class="r-sec-head">Summary</div><div class="r-summary">${esc(summary)}</div></div>`;
+
+  const eduF=d.edu.filter(e=>e.inst);
+  if(eduF.length){
+    h+=`<div class="r-sec"><div class="r-sec-head">Education</div>`;
+    eduF.forEach(e=>{
+      h+=`<div class="r-row">
+        <div class="r-top"><span class="r-bold">${esc(e.inst)}</span><span class="r-right">${esc(e.loc)}</span></div>
+        <div class="r-top"><span class="r-italic">${esc(e.deg)}${e.gpa?` &mdash; GPA: ${esc(e.gpa)}`:''}</span><span class="r-right">${esc(e.from)}${e.to?` &ndash; ${esc(e.to)}`:''}</span></div>
+        ${e.notes?`<div class="r-sub">${esc(e.notes)}</div>`:''}
+      </div>`;
+    });
+    h+=`</div>`;
+  }
+
+  const expF=d.exp.filter(e=>e.co);
+  if(expF.length){
+    h+=`<div class="r-sec"><div class="r-sec-head">Experience</div>`;
+    expF.forEach(e=>{
+      h+=`<div class="r-row">
+        <div class="r-top"><span class="r-bold">${esc(e.co)}</span><span class="r-right">${esc(e.loc)}</span></div>
+        <div class="r-top"><span class="r-italic">${esc(e.title)}${e.type?`, ${esc(e.type)}`:''}</span><span class="r-right">${esc(e.from)}${e.to?` &ndash; ${esc(e.to)}`:''}</span></div>
+        ${e.bullets?`<ul class="r-bullets">${buls(e.bullets)}</ul>`:''}
+      </div>`;
+    });
+    h+=`</div>`;
+  }
+
+  const projF=d.proj.filter(p=>p.name);
+  if(projF.length){
+    h+=`<div class="r-sec"><div class="r-sec-head">Projects</div>`;
+    projF.forEach(p=>{
+      const lks=[];
+      if(p.url) lks.push(`<a class="r-link" href="${esc(p.url.startsWith('http')?p.url:'https://'+p.url)}">Live Demo</a>`);
+      if(p.gh) lks.push(`<a class="r-link" href="${esc(p.gh.startsWith('http')?p.gh:'https://'+p.gh)}">GitHub</a>`);
+      h+=`<div class="r-row">
+        <div class="r-top">
+          <span><span class="r-bold">${esc(p.name)}</span>${p.tech?` <span class="r-italic">&mdash; ${esc(p.tech)}</span>`:''} ${lks.length?'&nbsp;'+lks.join(' &middot; '):''}</span>
+          <span class="r-right">${esc(p.date)}</span>
+        </div>
+        ${p.desc?`<ul class="r-bullets">${buls(p.desc)}</ul>`:''}
+      </div>`;
+    });
+    h+=`</div>`;
+  }
+
+  if(skills.length){
+    const tech=skills.filter(s=>/react|vue|angular|node|python|java|c\+\+|sql|aws|azure|docker|git|html|css|javascript|typescript|mongodb|postgres|redis|linux|go|rust|php|swift|kotlin|flutter|blazor|\.net|asp\.net|mysql|postgresql|tailwind|bootstrap|fastapi|django|spring|graphql|wwise|vercel|trello/i.test(s));
+    const other=skills.filter(s=>!tech.includes(s));
+    h+=`<div class="r-sec"><div class="r-sec-head">Skills</div><div class="r-skills-block">`;
+    if(tech.length) h+=`<div class="r-skill-line"><span class="r-skill-label">Technologies &amp; Frameworks: </span>${tech.map(esc).join(' &middot; ')}</div>`;
+    if(other.length) h+=`<div class="r-skill-line"><span class="r-skill-label">Other: </span>${other.map(esc).join(' &middot; ')}</div>`;
+    if(!tech.length&&!other.length) h+=`<div class="r-skill-line">${skills.map(esc).join(' &middot; ')}</div>`;
+    h+=`</div></div>`;
+  }
+
+  const certF=d.certs.filter(c=>c.title);
+  if(certF.length){
+    h+=`<div class="r-sec"><div class="r-sec-head">Certifications &amp; Awards</div>`;
+    certF.forEach(c=>{
+      h+=`<div class="r-row">
+        <div class="r-top"><span class="r-bold">${esc(c.title)}${c.org?` <span style="font-weight:400;">&mdash; ${esc(c.org)}</span>`:''}</span><span class="r-right">${esc(c.date)}</span></div>
+        ${c.url?`<div><a class="r-link" href="${esc(c.url)}">${esc(c.url)}</a></div>`:''}
+      </div>`;
+    });
+    h+=`</div>`;
+  }
+
+  h+=`</div>`;
+  document.getElementById('resume-out').innerHTML=h;
+}
+
+async function generate(){
+  const btn=document.getElementById('gen-btn');
+  btn.classList.add('loading');
+  document.getElementById('gen-label').textContent='Generating...';
+  btn.style.pointerEvents='none';
+  const d=collect();
+  let summary=d.summary;
+  if(!summary&&(d.exp.length||d.edu.length||skills.length)) summary=await fetchSummary(d);
+  renderResume(d,summary);
+  const score=atsScore(d);
+  const val=document.getElementById('ats-val');
+  val.textContent=score+'/100';
+  val.className='ats-val '+(score>=80?'hi':score>=55?'mid':'lo');
+  btn.classList.remove('loading');
+  document.getElementById('gen-label').textContent='Regenerate Resume';
+  btn.style.pointerEvents='';
+}
+
+addEdu(); addExp(); addProj();
+</script>
+</body>
+</html>
